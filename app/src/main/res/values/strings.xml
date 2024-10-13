@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Profile Directory</string>
+
+    <string name="cd_navigate_up">Navigate up</string>
+    <string name="loading">Loading…</string>
+    <string name="title_activity_profile_detail">ProfileDetail</string>
+</resources>
