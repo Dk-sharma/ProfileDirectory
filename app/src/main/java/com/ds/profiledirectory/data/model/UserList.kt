@@ -1,12 +1,13 @@
 package com.ds.profiledirectory.data.model
 
-import kotlinx.serialization.Serializable
 
-@Serializable
+
+
 data class UserList(
     val info: Info,
     val results: List<User>
 )
+
 
 data class User(
     val cell: String,

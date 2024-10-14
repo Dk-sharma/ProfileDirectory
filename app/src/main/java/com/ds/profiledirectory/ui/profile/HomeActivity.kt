@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -45,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,6 +63,7 @@ import com.ds.profiledirectory.ui.ShowError
 import com.ds.profiledirectory.ui.ShowLoading
 import com.ds.profiledirectory.ui.theme.ProfileDirectoryTheme
 import com.ds.profiledirectory.utils.AppConstants
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -148,6 +151,7 @@ fun ShowUserList(uiState: UiState<UserList>, modifier: Modifier) {
 fun ItemList(userList: UserList, modifier: Modifier) {
     var isSelected by remember { mutableStateOf(false) }
     var i by remember { mutableStateOf(0) }
+    val context = LocalContext.current
     LazyColumn {
         itemsIndexed(userList.results) {index, it->
             UserItem(it,index, modifier) { a->
@@ -157,7 +161,9 @@ fun ItemList(userList: UserList, modifier: Modifier) {
         }
     }
     if (isSelected){
-//        DetailsScreen(userList.results[i] )
+        val user = Gson().toJson(userList.results[i])
+        context.startActivity(Intent(context, ProfileDetail::class.java).putExtra("user", user))
+//        ProfileDetailScreen(userList.results[i] )
         isSelected = false
     }
 }

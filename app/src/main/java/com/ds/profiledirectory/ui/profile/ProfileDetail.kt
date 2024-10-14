@@ -1,7 +1,10 @@
 package com.ds.profiledirectory.ui.profile
 
+import android.content.Context
+import android.content.ContextWrapper
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -29,11 +32,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,11 +54,11 @@ import com.ds.profiledirectory.data.model.UserList
 import com.ds.profiledirectory.ui.ShowError
 import com.ds.profiledirectory.ui.ShowLoading
 import com.ds.profiledirectory.ui.profile.ui.theme.ProfileDirectoryTheme
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ProfileDetail : ComponentActivity() {
-
     private val profileViewModel by viewModels<ProfileViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,18 +67,20 @@ class ProfileDetail : ComponentActivity() {
 
         setContent {
             ProfileDirectoryTheme {
-                profileViewModel.fetchUserList(1)
+//                profileViewModel.fetchUserList(1)
 
-                DetailsScreen(profileViewModel )
-
+//                DetailsScreen(profileViewModel )
+                  val user = Gson().fromJson(intent.getStringExtra("user"),User::class.java)
+                  ProfileDetailScreen(user = user)
             }
 
 
         }
+
     }
 }
 
-@Composable
+/*@Composable
 fun DetailsScreen(profileModel: ProfileViewModel){
     val uiState by profileModel.uiState.collectAsStateWithLifecycle()
     ShowUserList(uiState = uiState)
@@ -86,16 +95,20 @@ fun ShowUserList(uiState: UiState<UserList>) {
         is UiState.Error -> ShowError(uiState.message)
 
     }
-}
+}*/
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileDetailScreen(
     user: User?/*,
     navController: NavHostController*/
 ) {
+    var isBackPressed by remember {
+        mutableStateOf(false)
+    }
+
     Scaffold(
         topBar = {
-            IconButton(onClick = {}) {
+            IconButton(onClick = { isBackPressed = true}) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.cd_navigate_up),
@@ -108,6 +121,18 @@ fun ProfileDetailScreen(
         ProfileContent(user = user, modifier = Modifier.padding(innerPadding))
     }
 
+    if (isBackPressed){
+        val context = LocalContext.current
+        context.getActivity()?.finish()
+
+    }
+
+}
+
+fun Context.getActivity(): ComponentActivity? = when (this) {
+    is ComponentActivity -> this
+    is ContextWrapper -> baseContext.getActivity()
+    else -> null
 }
 
 @ExperimentalMaterial3Api
